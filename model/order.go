@@ -28,47 +28,14 @@ func (order *Order) insert(ctx contractapi.TransactionContextInterface) (*Order,
 	return order, nil
 }
 
-func (order *Order) InsertWithCustomer(ctx contractapi.TransactionContextInterface) (*Order, error) {
-	order, err := order.parseArgsWithCustomer(ctx)
-	if err != nil {
-		return nil, err
-	}
-	order.Customer, err = order.Customer.Insert(ctx)
-	if err != nil {
-		return nil, err
-	}
+func (order *Order) Insert(ctx contractapi.TransactionContextInterface) (*Order, error) {
+
+	order.Customer, _= order.Customer.Insert(ctx)
 	return order.insert(ctx)
 }
 
-func (order *Order) InsertWithCustomerAndHouse(ctx contractapi.TransactionContextInterface) (*Order, error) {
-	order, err := order.parseArgsWithCustomerAndHouse(ctx)
-	if err != nil {
-		return nil, err
-	}
-	order.Customer, err = order.Customer.Insert(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return order.insert(ctx)
-}
 
 func (order *Order) Get(ctx contractapi.TransactionContextInterface) (*Order, error) {
-	var err error
-
-	if len(ctx.GetStub().GetArgs()) == 5 {
-		order, err = order.parseArgsWithCustomer(ctx)
-		if err != nil {
-			return nil, err
-		}
-	} else if len(ctx.GetStub().GetArgs()) == 9 {
-		order, err = order.parseArgsWithCustomerAndHouse(ctx)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, fmt.Errorf("parameters do not match")
-	}
-
 
 	customerAsBytes, err := ctx.GetStub().GetState(localUtils.MakeOrderKey(order.Id, order.Customer.Id, order.Customer.Name, order.Customer.PhoneNum))
 	if err != nil {
@@ -82,7 +49,7 @@ func (order *Order) Get(ctx contractapi.TransactionContextInterface) (*Order, er
 	return order, nil
 }
 
-func (order *Order) parseArgsWithCustomer(ctx contractapi.TransactionContextInterface) (*Order, error) {
+func (order *Order) ParseArgsWithCustomer(ctx contractapi.TransactionContextInterface) (*Order, error) {
 	args := ctx.GetStub().GetArgs()
 	// 4 parameters: 1、funcName; 2、customerId; 3、customerName; 4、customerPhoneNumber
 	if len(args) != 5 {
@@ -104,7 +71,7 @@ func (order *Order) parseArgsWithCustomer(ctx contractapi.TransactionContextInte
 	return order, nil
 }
 
-func (order *Order) parseArgsWithCustomerAndHouse(ctx contractapi.TransactionContextInterface) (*Order, error) {
+func (order *Order) ParseArgsWithCustomerAndHouse(ctx contractapi.TransactionContextInterface) (*Order, error) {
 	args := ctx.GetStub().GetArgs()
 	// 4 parameters: 1、funcName; 2、customerId; 3、customerName; 4、customerPhoneNumber
 	if len(args) != 9 {

@@ -21,9 +21,7 @@ func (customer *Customer) Insert(ctx contractapi.TransactionContextInterface) (*
 	if err != nil {
 		return nil, fmt.Errorf("Failed to marshal json array: %s ", err)
 	}
-	//k := localUtils.MakeCustomerKey(customer.Id, customer.Name, customer.PhoneNum)
-	//fmt.Println(k)
-	//fmt.Println(string(k))
+
 	err = ctx.GetStub().PutState(customer.Id, customerAsBytes)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to put into world state: %s ", err)

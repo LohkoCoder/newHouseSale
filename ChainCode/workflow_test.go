@@ -45,7 +45,7 @@ func testDownPayment(stub *shimtest.MockStub) {
 	}}
 
 func testConfirmDownPayment(stub *shimtest.MockStub) {
-	args := [][]byte{[]byte("ConfirmDownPayment"), []byte("32028219123123"), []byte("zjj"), []byte("1772132131")}
+	args := [][]byte{[]byte("ConfirmDownPayment"), []byte("123order"), []byte("32028219123123"), []byte("zjj"), []byte("1772132131")}
 	res := stub.MockInvoke("1", args)
 	if res.Status != 200 || res.Payload == nil {
 		fmt.Println(string(res.Message))
@@ -54,7 +54,7 @@ func testConfirmDownPayment(stub *shimtest.MockStub) {
 	}}
 
 func testFullPayment(stub *shimtest.MockStub) {
-	args := [][]byte{[]byte("FullPayment"), []byte("32028219123123"), []byte("zjj"), []byte("1772132131")}
+	args := [][]byte{[]byte("FullPayment"), []byte("123order"), []byte("32028219123123"), []byte("zjj"), []byte("1772132131")}
 	res := stub.MockInvoke("1", args)
 	if res.Status != 200 || res.Payload == nil {
 		fmt.Println(string(res.Message))
@@ -64,7 +64,7 @@ func testFullPayment(stub *shimtest.MockStub) {
 }
 
 func testConfirmFullPayment(stub *shimtest.MockStub) {
-	args := [][]byte{[]byte("ConfirmFullPayment"), []byte("32028219123123"), []byte("zjj"), []byte("1772132131")}
+	args := [][]byte{[]byte("ConfirmFullPayment"), []byte("123order"), []byte("32028219123123"), []byte("zjj"), []byte("1772132131")}
 	res := stub.MockInvoke("1", args)
 	if res.Status != 200 || res.Payload == nil {
 		fmt.Println(string(res.Message))
