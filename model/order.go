@@ -30,21 +30,29 @@ func (order *Order) insert(ctx contractapi.TransactionContextInterface) (*Order,
 
 func (order *Order) Insert(ctx contractapi.TransactionContextInterface) (*Order, error) {
 
-	order.Customer, _= order.Customer.Insert(ctx)
+	var err error
+	order.Customer, err = order.Customer.Insert(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return order.insert(ctx)
 }
 
 
 func (order *Order) Get(ctx contractapi.TransactionContextInterface) (*Order, error) {
 
-	customerAsBytes, err := ctx.GetStub().GetState(localUtils.MakeOrderKey(order.Id, order.Customer.Id, order.Customer.Name, order.Customer.PhoneNum))
+	orderAsBytes, err := ctx.GetStub().GetState(localUtils.MakeOrderKey(order.Id, order.Customer.Id, order.Customer.Name, order.Customer.PhoneNum))
 	if err != nil {
 		return nil, fmt.Errorf("Failed to query the world state: %s ", err.Error())
 	}
 
-	err = json.Unmarshal(customerAsBytes, order)
+	if orderAsBytes == nil {
+		return nil, nil
+	}
+
+	err = json.Unmarshal(orderAsBytes, order)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to query the world state: %s ", err.Error())
+		return nil, fmt.Errorf("Failed to unmarshal order json data: %s ", err.Error())
 	}
 	return order, nil
 }
@@ -57,6 +65,7 @@ func (order *Order) ParseArgsWithCustomer(ctx contractapi.TransactionContextInte
 	}
 
 	orderId := string(args[1])
+
 	customerId := string(args[2])
 	customerName := string(args[3])
 	customerPhonenum := string(args[4])
@@ -65,6 +74,7 @@ func (order *Order) ParseArgsWithCustomer(ctx contractapi.TransactionContextInte
 	}
 
 	order.Id = orderId
+	order.Customer = new(Customer)
 	order.Customer.Id = customerId
 	order.Customer.Name = customerName
 	order.Customer.PhoneNum = customerPhonenum
@@ -77,6 +87,7 @@ func (order *Order) ParseArgsWithCustomerAndHouse(ctx contractapi.TransactionCon
 	if len(args) != 9 {
 		return nil, fmt.Errorf("parameters do not match")
 	}
+
 
 	orderId := string(args[1])
 	customerId := string(args[2])
@@ -98,10 +109,12 @@ func (order *Order) ParseArgsWithCustomerAndHouse(ctx contractapi.TransactionCon
 	}
 
 	order.Id = orderId
+	order.Customer = new(Customer)
 	order.Customer.Id = customerId
 	order.Customer.Name = customerName
 	order.Customer.PhoneNum = customerPhonenum
 
+	order.House = new(House)
 	order.House.EstateOrg = estateOrg
 	order.House.Neighborhood = neighborhood
 	order.House.BuildingId = buildingId

@@ -22,7 +22,8 @@ func (customer *Customer) Insert(ctx contractapi.TransactionContextInterface) (*
 		return nil, fmt.Errorf("Failed to marshal json array: %s ", err)
 	}
 
-	err = ctx.GetStub().PutState(customer.Id, customerAsBytes)
+	k := localUtils.MakeCustomerKey(customer.Id, customer.Name, customer.PhoneNum)
+	err = ctx.GetStub().PutState(k, customerAsBytes)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to put into world state: %s ", err)
 	}
@@ -32,14 +33,18 @@ func (customer *Customer) Insert(ctx contractapi.TransactionContextInterface) (*
 
 func (customer *Customer) Get(ctx contractapi.TransactionContextInterface) (*Customer, error) {
 
-	customerAsBytes, err := ctx.GetStub().GetState(customer.Id)
+	customerAsBytes, err := ctx.GetStub().GetState(localUtils.MakeCustomerKey(customer.Id, customer.Name, customer.PhoneNum))
 	if err != nil {
 		return nil, fmt.Errorf("Failed to query the world state: %s ", err.Error())
 	}
 
+	if customerAsBytes == nil {
+		return nil, nil
+	}
+
 	err = json.Unmarshal(customerAsBytes, customer)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to query the world state: %s ", err.Error())
+		return nil, fmt.Errorf("Failed to unmarshal the customer data: %s ", err.Error())
 	}
 	return customer, nil
 }

@@ -1,6 +1,7 @@
 package workflow
 
 import (
+	"encoding/hex"
 	"golang.org/x/crypto/blake2b"
 	"hash"
 )
@@ -25,13 +26,13 @@ func Blake2b(data ...[]byte) (b32 Bytes32) {
 func MakeCustomerKey(id, name, phoneNum string) string{
 
 	hashBytes := Blake2b([]byte(id), []byte(name), []byte(phoneNum))
-	return string(hashBytes[:])
+	return hex.EncodeToString(hashBytes[:])
 }
 
 func MakeOrderKey(orderId,customerId, name, phoneNum string) string{
 
 	hashBytes := Blake2b([]byte(orderId), []byte(customerId), []byte(name), []byte(phoneNum))
-	return string(hashBytes[:])
+	return hex.EncodeToString(hashBytes[:])
 }
 
 /**
